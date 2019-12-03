@@ -27,7 +27,8 @@
                     android:id="@+id/btn_img"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    tools:src="@android:drawable/sym_def_app_icon" />
+                    android:src="@drawable/image0"
+                    android:scaleType="centerCrop"/>
 
                 <EditText
                     android:id="@+id/edit_name"
