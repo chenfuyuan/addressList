@@ -16,4 +16,6 @@ public class User {
     public String otherPhone;
 
     public String remark;
+
+    public String position;
 }
