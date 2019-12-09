@@ -38,6 +38,5 @@
                     android:layout_height="wrap_content"
                     android:hint="Enter the name or phone"
                     android:textSize="18sp"/>
-
         </LinearLayout>
 </RelativeLayout>

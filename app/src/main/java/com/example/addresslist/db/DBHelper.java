@@ -8,8 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.addresslist.pojo.User;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -87,6 +90,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ArrayList list = new ArrayList();
         while (cursor.moveToNext()) {
             HashMap map = new HashMap();
+            map.put("id", cursor.getInt(cursor.getColumnIndex("_id")));
             map.put("imageid",cursor.getInt(cursor.getColumnIndex("imageid")));
             map.put("name", cursor.getString(cursor.getColumnIndex("name")));
             map.put("phone", cursor.getString(cursor.getColumnIndex("phone")));
@@ -101,4 +105,63 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
+    /**
+     * 更新数据
+     * @return
+     */
+    public boolean update(User user) {
+        openDatabase();
+        int update = 0;
+            ContentValues value = new ContentValues();
+            value.put("name", user.name);
+            value.put("email", user.email);
+            value.put("company", user.company);
+            value.put("otherPhone", user.otherPhone);
+            value.put("remark", user.remark);
+            value.put("phone", user.phone);
+            value.put("imageid", user.imageId);
+            value.put("position", user.position);
+            update = database.update("user", value, "_id = ?", new String[]{user._id + ""});
+        return update!=0;
+    }
+
+
+    /**
+     * 删除用户
+     * @param id
+     * @return
+     */
+    public boolean delete(int id) {
+        openDatabase();
+        int delete = 0;
+        String whereClause= "_id = ?";
+        String[] whereArgs= new String[]{id+""};
+        delete = database.delete("user", whereClause, whereArgs);
+        return delete != 0;
+    }
+
+    public List<Map> selectByNameOrPhone(String message) {
+        openDatabase();
+        String selection = "name = ? or phone = ?";
+        String[] selectionArgs = new String[]{message, message};
+        Cursor cursor = database.query("user", null, selection, selectionArgs, null, null, null);
+
+        List<Map> list = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            HashMap map = new HashMap();
+            map.put("id", cursor.getInt(cursor.getColumnIndex("_id")));
+            map.put("imageid",cursor.getInt(cursor.getColumnIndex("imageid")));
+            map.put("name", cursor.getString(cursor.getColumnIndex("name")));
+            map.put("phone", cursor.getString(cursor.getColumnIndex("phone")));
+            map.put("company", cursor.getString(cursor.getColumnIndex("company")));
+            map.put("email", cursor.getString(cursor.getColumnIndex("email")));
+            map.put("otherPhone", cursor.getString(cursor.getColumnIndex("otherPhone")));
+            map.put("remark", cursor.getString(cursor.getColumnIndex("remark")));
+            map.put("position", cursor.getString(cursor.getColumnIndex("position")));
+            list.add(map);
+        }
+
+        return list;
+
+    }
 }

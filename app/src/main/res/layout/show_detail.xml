@@ -28,7 +28,8 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:src="@drawable/image0"
-                    android:scaleType="centerCrop"/>
+                    android:scaleType="centerCrop"
+                    android:enabled="false"/>
 
                 <EditText
                     android:id="@+id/edit_name"
@@ -37,7 +38,7 @@
                     android:layout_gravity="center_vertical"
                     android:gravity="top"
                     android:hint="姓名"
-                    android:editable="false"/>
+                    />
 
             </LinearLayout>
             <!--手机-->
@@ -61,7 +62,7 @@
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
                     android:hint="手机"
-                    android:editable="false"/>
+                    />
             </LinearLayout>
             <!--公司-->
             <LinearLayout
@@ -84,7 +85,7 @@
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
                     android:hint="公司"
-                    android:editable="false"/>
+                    />
             </LinearLayout>
             <!--职位-->
             <LinearLayout
@@ -107,7 +108,7 @@
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
                     android:hint="职位"
-                    android:editable="false"/>
+                    />
             </LinearLayout>
 
             <!--电子邮箱-->
@@ -131,7 +132,7 @@
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
                     android:hint="电子邮箱"
-                    android:editable="false"/>
+                    />
             </LinearLayout>
 
             <!--其他联系方式-->
@@ -155,7 +156,7 @@
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
                     android:hint="其他联系方式"
-                    android:editable="false"/>
+                    />
             </LinearLayout>
 
             <!--备注-->
@@ -179,7 +180,7 @@
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
                     android:hint="备注"
-                    android:editable="false"/>
+                    />
 
             </LinearLayout>
         </LinearLayout>
@@ -194,6 +195,13 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="保存"
+            android:visibility="gone"/>
         <Button
             android:id="@+id/btn_edit"
             android:layout_width="wrap_content"

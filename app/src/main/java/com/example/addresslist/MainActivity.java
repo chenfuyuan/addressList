@@ -10,8 +10,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -25,11 +27,45 @@ public class MainActivity extends AppCompatActivity {
     private GridView gv_buttom_menu;
     private ListView lv_userList;
     private SimpleAdapter adapter;
+    private LinearLayout ll_search;
+    private EditText et_search;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loadUserList();    //加载用户列表
+        findAllView();
+        setListener();
+    }
+
+    private void findAllView() {
+        ll_search = findViewById(R.id.ll_search);
+        et_search = findViewById(R.id.et_search);
+    }
+
+    private void setListener() {
+        et_search.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                switch (keyEvent.getAction()) {
+                    case KeyEvent.ACTION_UP:             //键盘松开
+                        String message = et_search.getText().toString();
+                        System.out.println(message);
+
+                        ArrayList users_data = (ArrayList) DBHelper.getInstance(MainActivity.this).selectByNameOrPhone(message);
+                        adapter = new SimpleAdapter(MainActivity.this,
+                                users_data,
+                                R.layout.list_item, new String[]{"imageid", "name", "phone"},
+                                new int[]{R.id.user_image,R.id.tv_showname, R.id.tv_showPhone});
+                        lv_userList.setAdapter(adapter);
+                    case KeyEvent.ACTION_DOWN:          //键盘按下
+                        break;
+                }
+                return false;
+
+            }
+        });
+
     }
 
     @Override
@@ -96,6 +132,10 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(intent,0);
                         break;
                     }
+                    case 1:{
+                        ll_search.setVisibility(View.VISIBLE);
+                        break;
+                    }
                 }
             }
         });
@@ -106,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        if (requestCode == 0) {
+        if (requestCode == 0 || requestCode == 3) {
             if (resultCode == 1) {
                 //增加成功，刷新页面
                 ArrayList users_data = DBHelper.getInstance(this).getUserList();

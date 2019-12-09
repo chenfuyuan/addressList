@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +18,11 @@ import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.example.addresslist.db.DBHelper;
 import com.example.addresslist.pojo.User;
-
-import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +51,7 @@ public class ShowDetailActivity extends AppCompatActivity {
     private Button btn_edit;
     private Button btn_return;
     private Button btn_delete;
+    private Button btn_save;
 
     private Map userMap;
 
@@ -67,8 +64,20 @@ public class ShowDetailActivity extends AppCompatActivity {
         userMap = (HashMap) intent.getSerializableExtra("userMap");
         findAllView();
         initAllViewText();
+        initEditTextNotEnabled();
         initImageChooseDialog();
         setOnclickListener();
+    }
+
+
+    private void initEditTextNotEnabled() {
+        edit_name.setEnabled(false);
+        edit_phone.setEnabled(false);
+        edit_company.setEnabled(false);
+        edit_ohterPhone.setEnabled(false);
+        edit_email.setEnabled(false);
+        edit_remark.setEnabled(false);
+        edit_position.setEnabled(false);
     }
 
     /*设置点击监听器*/
@@ -77,13 +86,30 @@ public class ShowDetailActivity extends AppCompatActivity {
             imageChooseDialog.show();
         });
 
-        btn_edit.setOnClickListener(view -> {
+//      是输入框可编辑，并替换成保存按钮
+        btn_edit.setOnClickListener(view->{
+            edit_name.setEnabled(true);
+            edit_phone.setEnabled(true);
+            edit_company.setEnabled(true);
+            edit_position.setEnabled(true);
+            edit_ohterPhone.setEnabled(true);
+            edit_remark.setEnabled(true);
+            edit_email.setEnabled(true);
+            btn_edit.setVisibility(View.GONE);
+            btn_save.setVisibility(View.VISIBLE);
+        });
+
+
+        /*设置保存按钮点击事件*/
+        btn_save.setOnClickListener(view -> {
             String name = edit_name.getText().toString();
             if (name.equals("")) {
                 Toast.makeText(this, "姓名不能为空", Toast.LENGTH_LONG).show();
                 return;
             }
             User user = new User();
+            user._id = (int) userMap.get("id");
+            System.out.println(user._id);;
             user.name = edit_name.getText().toString();
             user.phone = edit_phone.getText().toString();
             user.email = edit_email.getText().toString();
@@ -93,28 +119,31 @@ public class ShowDetailActivity extends AppCompatActivity {
             user.position = edit_position.getText().toString();
             user.imageId = images[imagePosition];
 
-//            long success = DBHelper.getInstance(ShowDetailActivity.this).save(user);
-//            if (success != -1) {
-//                Toast.makeText(ShowDetailActivity.this, "添加成功！", Toast.LENGTH_SHORT).show();
-////             resultCode为1时代表增加用户成功，返回主页面
-//                setResult(1);
-//                finish();
-//            } else {
-//                Toast.makeText(ShowDetailActivity.this, "添加失败！请重新操作", Toast.LENGTH_SHORT).show();
-//
-////             resultCode为1时代表增加用户成功，返回主页面
-//                setResult(2);
-//                finish();
-//
-//            }
-            //save User
-            //使用系统提供的工具类
-
+            boolean success = DBHelper.getInstance(ShowDetailActivity.this).update(user);
+            if (success) {
+                //成功后，锁定编辑框，数据库更改数据
+                Toast.makeText(ShowDetailActivity.this, "保存成功", Toast.LENGTH_LONG).show();
+                initEditTextNotEnabled();
+            } else {
+                Toast.makeText(ShowDetailActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
+            }
         });
 
         btn_return.setOnClickListener(view -> {
-            setResult(2);
+            setResult(1);
             finish();
+        });
+
+        btn_delete.setOnClickListener(view ->{
+            int id = (int) userMap.get("id");
+            boolean success = DBHelper.getInstance(ShowDetailActivity.this).delete(id);
+            if (success) {
+                Toast.makeText(ShowDetailActivity.this, "删除成功", Toast.LENGTH_LONG).show();
+                setResult(1);
+                finish();
+            } else {
+                Toast.makeText(ShowDetailActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
+            }
         });
 
     }
@@ -190,6 +219,7 @@ public class ShowDetailActivity extends AppCompatActivity {
         btn_edit = findViewById(R.id.btn_edit);
         btn_return = findViewById(R.id.btn_return);
         btn_delete = findViewById(R.id.btn_delete);
+        btn_save = findViewById(R.id.btn_save);
     }
 
     /**
