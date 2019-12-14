@@ -127,6 +127,8 @@ public class ShowDetailActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(ShowDetailActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
             }
+            btn_save.setVisibility(View.GONE);
+            btn_edit.setVisibility(View.VISIBLE);
         });
 
         btn_return.setOnClickListener(view -> {

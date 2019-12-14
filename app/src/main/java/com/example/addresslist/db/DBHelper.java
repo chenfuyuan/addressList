@@ -164,4 +164,20 @@ public class DBHelper extends SQLiteOpenHelper {
         return list;
 
     }
+
+    public List selectByCompany(){
+        openDatabase();
+        String[] columns = new String[]{"company","count(*) as c_size"};
+        String groupBy = "company";
+        Cursor cursor = database.query("user", columns, null, null, groupBy, null, null);
+
+        ArrayList list = new ArrayList();
+        while (cursor.moveToNext()) {
+            HashMap map = new HashMap();
+            map.put("company", cursor.getString(cursor.getColumnIndex("company")));
+            map.put("c_size", cursor.getInt(cursor.getColumnIndex("c_size")));
+            list.add(map);
+        }
+        return list;
+    }
 }

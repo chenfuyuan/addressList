@@ -19,6 +19,7 @@ import android.widget.SimpleAdapter;
 
 import com.example.addresslist.db.DBHelper;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadButtonMenu() {
         gv_buttom_menu = this.findViewById(R.id.gv_button_menu);
-        gv_buttom_menu.setNumColumns(5);    //设置列数
+        gv_buttom_menu.setNumColumns(4);    //设置列数
         gv_buttom_menu.setGravity(Gravity.CENTER);
         gv_buttom_menu.setVerticalSpacing(10);
         gv_buttom_menu.setHorizontalSpacing(10);
@@ -133,7 +134,17 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                     case 1:{
-                        ll_search.setVisibility(View.VISIBLE);
+                        if (ll_search.getVisibility() == View.GONE) {
+                            ll_search.setVisibility(View.VISIBLE);
+                        } else {
+                            ll_search.setVisibility(View.GONE);
+                        }
+                        break;
+                    }
+
+                    case 2:{
+                        Intent intent = new Intent(MainActivity.this, GroupActivity.class);
+                        startActivityForResult(intent,0);
                         break;
                     }
                 }
@@ -173,13 +184,8 @@ public class MainActivity extends AppCompatActivity {
         data.add(map);
 
         map = new HashMap();
-        map.put("itemImage", R.drawable.delete);
-        map.put("itemText", "删除");
-        data.add(map);
-
-        map = new HashMap();
-        map.put("itemImage", R.drawable.menu);
-        map.put("itemText", "菜单");
+        map.put("itemImage", R.drawable.group);
+        map.put("itemText", "分组");
         data.add(map);
 
         map = new HashMap();
