@@ -51,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         //建表
         StringBuffer tableCreate = new StringBuffer();
-        tableCreate.append("create table user ( _id integer primary key autoincrement,").append("name text,").append("email text,").append("company text,").append("otherPhone text,").append("remark text,").append("phone text,").append("position text,").append("imageid int )");
+        tableCreate.append("create table user ( _id integer primary key autoincrement,").append("name text,").append("email text,").append("company text,").append("otherPhone text,").append("remark text,").append("phone text,").append("position text);");
 
         sqLiteDatabase.execSQL(tableCreate.toString());
     }
@@ -73,7 +73,6 @@ public class DBHelper extends SQLiteOpenHelper {
         value.put("otherPhone", user.otherPhone);
         value.put("remark", user.remark);
         value.put("phone", user.phone);
-        value.put("imageid", user.imageId);
         value.put("position",user.position);
         //保存到数据库
         return database.insert("user", null, value);
@@ -91,7 +90,6 @@ public class DBHelper extends SQLiteOpenHelper {
         while (cursor.moveToNext()) {
             HashMap map = new HashMap();
             map.put("id", cursor.getInt(cursor.getColumnIndex("_id")));
-            map.put("imageid",cursor.getInt(cursor.getColumnIndex("imageid")));
             map.put("name", cursor.getString(cursor.getColumnIndex("name")));
             map.put("phone", cursor.getString(cursor.getColumnIndex("phone")));
             map.put("company", cursor.getString(cursor.getColumnIndex("company")));
@@ -119,7 +117,6 @@ public class DBHelper extends SQLiteOpenHelper {
             value.put("otherPhone", user.otherPhone);
             value.put("remark", user.remark);
             value.put("phone", user.phone);
-            value.put("imageid", user.imageId);
             value.put("position", user.position);
             update = database.update("user", value, "_id = ?", new String[]{user._id + ""});
         return update!=0;
@@ -140,17 +137,20 @@ public class DBHelper extends SQLiteOpenHelper {
         return delete != 0;
     }
 
-    public List<Map> selectByNameOrPhone(String message) {
+    public List<Map> selectByNameOrPhone(String message,String company) {
         openDatabase();
-        String selection = "name = ? or phone = ?";
+        String selection = "(name like ? or phone like ?)";
         String[] selectionArgs = new String[]{message, message};
+        if (company != null) {
+            selection += "and company = ?";
+            selectionArgs = new String[]{message,message,company};
+        }
         Cursor cursor = database.query("user", null, selection, selectionArgs, null, null, null);
 
         List<Map> list = new ArrayList<>();
         while (cursor.moveToNext()) {
             HashMap map = new HashMap();
             map.put("id", cursor.getInt(cursor.getColumnIndex("_id")));
-            map.put("imageid",cursor.getInt(cursor.getColumnIndex("imageid")));
             map.put("name", cursor.getString(cursor.getColumnIndex("name")));
             map.put("phone", cursor.getString(cursor.getColumnIndex("phone")));
             map.put("company", cursor.getString(cursor.getColumnIndex("company")));
@@ -165,12 +165,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public List selectByCompany(){
+    public List selectByCompanySize(){
         openDatabase();
         String[] columns = new String[]{"company","count(*) as c_size"};
+        String selection =  "company is not null and company!=''";
         String groupBy = "company";
-        Cursor cursor = database.query("user", columns, null, null, groupBy, null, null);
-
+        Cursor cursor = database.query("user", columns, selection, null, groupBy, null, null);
         ArrayList list = new ArrayList();
         while (cursor.moveToNext()) {
             HashMap map = new HashMap();
@@ -179,5 +179,77 @@ public class DBHelper extends SQLiteOpenHelper {
             list.add(map);
         }
         return list;
+    }
+
+    public int selectNotCompanySize() {
+        openDatabase();
+        String[] columns = new String[]{"count(*) as c_size"};
+        String selection =  "company is null or company=''";
+        Cursor cursor = database.query("user", columns, selection, null, null, null, null);
+        cursor.moveToNext();
+        int size = cursor.getInt(cursor.getColumnIndex("c_size"));
+        return size;
+
+    }
+
+    public List selectByComapany(String name) {
+        openDatabase();
+        String selection = "company = ?";
+        String [] selectionArgs = new String[]{name};
+        Cursor cursor = database.query("user", null, selection, selectionArgs, null, null, null);
+        ArrayList list = new ArrayList();
+        while (cursor.moveToNext()) {
+            HashMap map = new HashMap();
+            map.put("id", cursor.getInt(cursor.getColumnIndex("_id")));
+            map.put("name", cursor.getString(cursor.getColumnIndex("name")));
+            map.put("phone", cursor.getString(cursor.getColumnIndex("phone")));
+            map.put("company", cursor.getString(cursor.getColumnIndex("company")));
+            map.put("email", cursor.getString(cursor.getColumnIndex("email")));
+            map.put("otherPhone", cursor.getString(cursor.getColumnIndex("otherPhone")));
+            map.put("remark", cursor.getString(cursor.getColumnIndex("remark")));
+            map.put("position", cursor.getString(cursor.getColumnIndex("position")));
+            list.add(map);
+        }
+        return list;
+    }
+
+    public List selectNotCompany() {
+        openDatabase();
+        String selection = "company is null or company =''";
+        Cursor cursor = database.query("user", null, selection, null, null, null, null);
+        ArrayList list = new ArrayList();
+        while (cursor.moveToNext()) {
+            HashMap map = new HashMap();
+            map.put("id", cursor.getInt(cursor.getColumnIndex("_id")));
+            map.put("name", cursor.getString(cursor.getColumnIndex("name")));
+            map.put("phone", cursor.getString(cursor.getColumnIndex("phone")));
+            map.put("company", cursor.getString(cursor.getColumnIndex("company")));
+            map.put("email", cursor.getString(cursor.getColumnIndex("email")));
+            map.put("otherPhone", cursor.getString(cursor.getColumnIndex("otherPhone")));
+            map.put("remark", cursor.getString(cursor.getColumnIndex("remark")));
+            map.put("position", cursor.getString(cursor.getColumnIndex("position")));
+            list.add(map);
+        }
+        return list;
+    }
+
+    public User selectByPhone(String phone) {
+        openDatabase();
+        String selection = "phone = ?";
+        String[] selectionArgs = new String[]{phone};
+        Cursor cursor = database.query("user", null, selection, selectionArgs, null, null, null);
+        User user =null;
+        if (cursor.moveToNext()) {
+            user = new User();
+            user._id =  cursor.getInt(cursor.getColumnIndex("_id"));
+            user.name =  cursor.getString(cursor.getColumnIndex("name"));
+            user.phone =  cursor.getString(cursor.getColumnIndex("phone"));
+            user.company = cursor.getString(cursor.getColumnIndex("company"));
+            user.email =cursor.getString(cursor.getColumnIndex("email"));
+            user.otherPhone = cursor.getString(cursor.getColumnIndex("otherPhone"));
+            user.remark = cursor.getString(cursor.getColumnIndex("remark"));
+            user.position =  cursor.getString(cursor.getColumnIndex("position"));
+        }
+        return user;
     }
 }

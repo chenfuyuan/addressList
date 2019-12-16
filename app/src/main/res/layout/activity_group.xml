@@ -13,8 +13,23 @@
         <ListView
             android:id="@+id/lv_company"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></ListView>
+            android:layout_height="wrap_content">
+
+        </ListView>
+
     </LinearLayout>
+
+    <GridView
+        android:id="@+id/gv_button_menu"
+        android:layout_width="match_parent"
+        android:layout_height="65sp"
+        android:layout_alignParentBottom="true"
+        ></GridView>
+
+
+
+
+
 
 
 </RelativeLayout>

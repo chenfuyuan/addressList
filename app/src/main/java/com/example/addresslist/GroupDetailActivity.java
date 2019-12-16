@@ -9,11 +9,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -21,24 +19,29 @@ import android.widget.SimpleAdapter;
 
 import com.example.addresslist.db.DBHelper;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class GroupDetailActivity extends AppCompatActivity {
+
     private GridView gv_buttom_menu;
     private ListView lv_userList;
     private SimpleAdapter adapter;
+
     private EditText et_search;
+    private String companyName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        loadButtonMenu();
+        setContentView(R.layout.activity_group_detail);
+        Intent intent = getIntent();
+        companyName = intent.getStringExtra("companyName");
+        loadButtonMenu();    //加载底部导航栏
         loadUserList();    //加载用户列表
-        findAllView();
-        setListener();
+        findAllView();    //寻找所有视图
+        setListener();    //设置监听器
     }
 
     private void findAllView() {
@@ -51,16 +54,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
+
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
+
             @Override
             public void afterTextChanged(Editable editable) {
                 String message = et_search.getText().toString();
                 System.out.println(message);
 
-                ArrayList users_data = (ArrayList) DBHelper.getInstance(MainActivity.this).selectByNameOrPhone("%" + message + "%",null);
-                adapter = new SimpleAdapter(MainActivity.this,
+                ArrayList users_data = (ArrayList) DBHelper.getInstance(GroupDetailActivity.this).selectByNameOrPhone("%" + message + "%",companyName);
+                adapter = new SimpleAdapter(GroupDetailActivity.this,
                         users_data,
                         R.layout.list_item, new String[]{"name", "phone"},
                         new int[]{R.id.tv_showname, R.id.tv_showPhone});
@@ -74,14 +79,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadUserList() {
         lv_userList = findViewById(R.id.lv_userList);
-        ArrayList users_data = DBHelper.getInstance(this).getUserList();
+        List users_data;
+        if (companyName.equals("无公司信息")) {
+            companyName = "";
+            users_data = DBHelper.getInstance(this).selectNotCompany();
+        } else {
+            users_data = DBHelper.getInstance(this).selectByComapany(companyName);
+        }
         adapter = new SimpleAdapter(this, users_data, R.layout.list_item, new String[]{"name", "phone"}, new int[]{R.id.tv_showname, R.id.tv_showPhone});
         lv_userList.setAdapter(adapter);
         lv_userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 HashMap map = (HashMap) adapterView.getItemAtPosition(i);
-                Intent intent = new Intent(MainActivity.this,ShowDetailActivity.class);
+                Intent intent = new Intent(GroupDetailActivity.this, ShowDetailActivity.class);
                 intent.putExtra("userMap", map);
 //              当requestCode为3时，请求转向DetailActivity这个页面
                 startActivityForResult(intent, 3);
@@ -94,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadButtonMenu() {
         gv_buttom_menu = this.findViewById(R.id.gv_button_menu);
-        gv_buttom_menu.setNumColumns(3);    //设置列数
+        gv_buttom_menu.setNumColumns(2);    //设置列数
         gv_buttom_menu.setGravity(Gravity.CENTER);
         gv_buttom_menu.setVerticalSpacing(10);
         gv_buttom_menu.setHorizontalSpacing(10);
@@ -112,19 +123,13 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i) {
                     case 0: {
-                        Intent intent = new Intent(MainActivity.this,AddNewActivity.class);
+                        Intent intent = new Intent(GroupDetailActivity.this, AddNewActivity.class);
                         //0代表请求跳转到添加页面
-                        startActivityForResult(intent,0);
+                        startActivityForResult(intent, 0);
                         break;
                     }
-
-                    case 1:{
-                        Intent intent = new Intent(MainActivity.this, GroupActivity.class);
-                        startActivityForResult(intent,0);
-                        break;
-                    }
-                    case 2:{
-                        android.os.Process.killProcess(android.os.Process.myPid());
+                    case 1: {
+                        finish();
                         break;
                     }
                 }
@@ -143,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList users_data = DBHelper.getInstance(this).getUserList();
                 adapter = new SimpleAdapter(this,
                         users_data,
-                        R.layout.list_item, new String[]{ "name", "phone"},
+                        R.layout.list_item, new String[]{"name", "phone"},
                         new int[]{R.id.tv_showname, R.id.tv_showPhone});
                 lv_userList.setAdapter(adapter);
             } else if (resultCode == 2) {
@@ -158,17 +163,10 @@ public class MainActivity extends AppCompatActivity {
         map.put("itemText", "增加");
         data.add(map);
 
-
-        map = new HashMap();
-        map.put("itemImage", R.drawable.group);
-        map.put("itemText", "分组");
-        data.add(map);
-
         map = new HashMap();
         map.put("itemImage", R.drawable.quit);
-        map.put("itemText", "退出");
+        map.put("itemText", "返回");
         data.add(map);
-
 
     }
 }

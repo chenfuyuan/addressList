@@ -1,11 +1,9 @@
 package com.example.addresslist;
 
 import com.example.addresslist.db.DBHelper;
-import com.example.addresslist.pojo.User;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +22,7 @@ public class ExampleUnitTest {
 
     @Test
     public void testSelectByCompany() {
-        List lists = DBHelper.getInstance(null).selectByCompany();
+        List lists = DBHelper.getInstance(null).selectByCompanySize();
         for (int i = 0; i < lists.size(); i++) {
             Map map = (Map) lists.get(i);
             String company = (String) map.get("company");

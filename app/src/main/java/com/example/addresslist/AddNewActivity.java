@@ -25,17 +25,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.addresslist.db.DBHelper;
 import com.example.addresslist.pojo.User;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AddNewActivity extends AppCompatActivity {
     private static final String TAG = "AddNewActivity";
-    private ImageButton btn_img;
-    private AlertDialog imageChooseDialog;
-    private Gallery gallery;
-    private ImageSwitcher imageSwitcher;
-    //用于保存选中图片
-    private int imagePosition;
-    /*存放头像*/
-    private int[] images = {R.drawable.image0,R.drawable.image1, R.drawable.image2, R.drawable.image3, R.drawable.image4, R.drawable.image5, R.drawable.image6, R.drawable.image7, R.drawable.image8, R.drawable.image9, R.drawable.image10, R.drawable.image11, R.drawable.image12, R.drawable.image13, R.drawable.image14, R.drawable.image15, R.drawable.image16, R.drawable.image17, R.drawable.image18, R.drawable.image19, R.drawable.image20};
-
     /*输入栏*/
     private EditText edit_name;
     private EditText edit_phone;
@@ -44,15 +38,18 @@ public class AddNewActivity extends AppCompatActivity {
     private EditText edit_ohterPhone;
     private EditText edit_remark;
     private EditText edit_position;
-    private int imageId;
+
 //   按钮
     private Button btn_save;
     private Button btn_return;
 
+    //用于暂存user
+    private User user;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addnew);
+        //初始化
         init();
 
         setOnclickListener();
@@ -60,59 +57,13 @@ public class AddNewActivity extends AppCompatActivity {
 
     private void init() {
         findAllView();
-        initImageChooseDialog();
     }
 
-    private void initImageChooseDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("请选择图像");
-        //确定
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                btn_img.setImageResource(images[imagePosition]);
-            }
-        });
-
-        /*渲染成view*/
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.images_switch, null);
-        //从view 中获取gallery 和 imageSwitcher
-        gallery = view.findViewById(R.id.img_gallery);
-        imageSwitcher = view.findViewById(R.id.img_switcher);
-        //将图片放入
-        gallery.setAdapter(new ImageAdapter(this));
-        gallery.setSelection(images.length/2);
-        gallery.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                imagePosition = i;
-                imageSwitcher.setImageResource(images[i]);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        imageSwitcher.setFactory(new MyViewFactory(this));
-
-        builder.setView(view);
-        imageChooseDialog = builder.create();
-    }
 
     private void setOnclickListener() {
-        btn_img.setOnClickListener(view -> {
-            imageChooseDialog.show();
-        });
 
         btn_save.setOnClickListener(view ->{
-            String name = edit_name.getText().toString();
-            if (name.equals("")) {
-                Toast.makeText(this, "姓名不能为空", Toast.LENGTH_LONG).show();
-                return;
-            }
-            User user = new User();
+            user = new User();
             user.name = edit_name.getText().toString();
             user.phone = edit_phone.getText().toString();
             user.email = edit_email.getText().toString();
@@ -120,7 +71,16 @@ public class AddNewActivity extends AppCompatActivity {
             user.company = edit_company.getText().toString();
             user.remark = edit_remark.getText().toString();
             user.position = edit_position.getText().toString();
-            user.imageId = images[imagePosition];
+            if (haveError()) {
+                return;
+            }
+
+            //判断电话号码是否存在
+            User user1 = DBHelper.getInstance(this).selectByPhone(user.phone);
+            if (user1 != null) {
+                Toast.makeText(this, "电话号码已存在", Toast.LENGTH_LONG).show();
+                return;
+            }
             Log.d(TAG, "执行save操作");
             long success = DBHelper.getInstance(AddNewActivity.this).save(user);
             if (success != -1) {
@@ -148,9 +108,48 @@ public class AddNewActivity extends AppCompatActivity {
 
     }
 
+    //检测输入的是否正确
+    private boolean haveError() {
+        if (user.name.equals("")) {
+            Toast.makeText(this, "姓名不能为空", Toast.LENGTH_LONG).show();
+            return true;
+        }
+        Pattern p = null;
+        Matcher m = null;
+        boolean b = false;
+        //验证手机号
+        if (user.phone.equals("")) {
+            Toast.makeText(this, "手机号不能为空", Toast.LENGTH_LONG).show();
+            return true;
+        }
+        //验证手机号格式
+        p = Pattern.compile("^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$"); // 验证手机号
+        m = p.matcher(user.phone);
+        b = m.matches();
+        if (!b) {
+            Toast.makeText(this, "电话号码格式错误", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        //验证邮箱
+        if(!user.email.equals("")){
+            p = Pattern.compile("^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$"); //验证邮箱
+            m = p.matcher(user.email);
+            b = m.matches();
+            if (!b) {
+                Toast.makeText(this, "email格式错误", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
     /*找到所有控件*/
     private void findAllView() {
-        btn_img = findViewById(R.id.btn_img);
+
         edit_company = findViewById(R.id.edit_company);
         edit_email = findViewById(R.id.edit_email);
         edit_name = findViewById(R.id.edit_name);
@@ -177,40 +176,5 @@ public class AddNewActivity extends AppCompatActivity {
             return imageView;
         }
     }
-    /**
-     * ImageAdapter
-     */
-    class ImageAdapter extends BaseAdapter {
-        private Context context;
 
-        public ImageAdapter(Context context) {
-            System.out.println(context);
-            this.context = context;
-        }
-        @Override
-
-        public int getCount() {
-            return images.length;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            ImageView imageView = new ImageView(context);
-            imageView.setImageResource(images[i]);
-            imageView.setAdjustViewBounds(true);
-            imageView.setLayoutParams(new Gallery.LayoutParams(80, 80));
-            imageView.setPadding(15,10,15,10);
-            return imageView;
-        }
-    }
 }

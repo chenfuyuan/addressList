@@ -23,21 +23,13 @@
                 android:layout_marginRight="10dp"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/btn_img"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/image0"
-                    android:scaleType="centerCrop"
-                    android:enabled="false"/>
-
                 <EditText
                     android:id="@+id/edit_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:gravity="top"
-                    android:hint="姓名"
+
                     />
 
             </LinearLayout>
@@ -61,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
-                    android:hint="手机"
+
                     />
             </LinearLayout>
             <!--公司-->
@@ -84,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
-                    android:hint="公司"
+
                     />
             </LinearLayout>
             <!--职位-->
@@ -107,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
-                    android:hint="职位"
+
                     />
             </LinearLayout>
 
@@ -131,7 +123,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
-                    android:hint="电子邮箱"
+
                     />
             </LinearLayout>
 
@@ -155,7 +147,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
-                    android:hint="其他联系方式"
+
                     />
             </LinearLayout>
 
@@ -179,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="top"
-                    android:hint="备注"
+
                     />
 
             </LinearLayout>

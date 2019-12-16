@@ -3,7 +3,6 @@ package com.example.addresslist.pojo;
 public class User {
     public int _id;
 
-    public int imageId;
 
     public String name;
 

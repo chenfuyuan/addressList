@@ -4,18 +4,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
-import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -26,11 +20,17 @@ import com.example.addresslist.pojo.User;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-/*展示详情*/
-public class ShowDetailActivity extends AppCompatActivity {
+public class ModifyActivity extends AppCompatActivity {
+
+
+    private AlertDialog imageChooseDialog;
+    private Gallery gallery;
+    private ImageSwitcher imageSwitcher;
+    //用于保存选中图片
+    private int imagePosition;
+
+
     /*输入栏*/
     private EditText edit_name;
     private EditText edit_phone;
@@ -46,7 +46,7 @@ public class ShowDetailActivity extends AppCompatActivity {
     private Button btn_save;
 
     private Map userMap;
-    private User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,9 +90,15 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         /*设置保存按钮点击事件*/
         btn_save.setOnClickListener(view -> {
-            user = new User();
+            String name = edit_name.getText().toString();
+            if (name.equals("")) {
+                Toast.makeText(this, "姓名不能为空", Toast.LENGTH_LONG).show();
+                return;
+            }
+            User user = new User();
             user._id = (int) userMap.get("id");
             System.out.println(user._id);
+            ;
             user.name = edit_name.getText().toString();
             user.phone = edit_phone.getText().toString();
             user.email = edit_email.getText().toString();
@@ -100,25 +106,14 @@ public class ShowDetailActivity extends AppCompatActivity {
             user.company = edit_company.getText().toString();
             user.remark = edit_remark.getText().toString();
             user.position = edit_position.getText().toString();
-            if (haveError()) {
-                return;
-            }
 
-            //判断电话号码是否存在
-            User user1 = DBHelper.getInstance(this).selectByPhone(user.phone);
-
-            if (user1 != null && user1._id!=user._id) {
-                Toast.makeText(this, "电话号码已存在", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            boolean success = DBHelper.getInstance(ShowDetailActivity.this).update(user);
+            boolean success = DBHelper.getInstance(ModifyActivity.this).update(user);
             if (success) {
                 //成功后，锁定编辑框，数据库更改数据
-                Toast.makeText(ShowDetailActivity.this, "保存成功", Toast.LENGTH_LONG).show();
+                Toast.makeText(ModifyActivity.this, "保存成功", Toast.LENGTH_LONG).show();
                 initEditTextNotEnabled();
             } else {
-                Toast.makeText(ShowDetailActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ModifyActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
             }
             btn_save.setVisibility(View.GONE);
             btn_edit.setVisibility(View.VISIBLE);
@@ -131,54 +126,17 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         btn_delete.setOnClickListener(view -> {
             int id = (int) userMap.get("id");
-            boolean success = DBHelper.getInstance(ShowDetailActivity.this).delete(id);
+            boolean success = DBHelper.getInstance(ModifyActivity.this).delete(id);
             if (success) {
-                Toast.makeText(ShowDetailActivity.this, "删除成功", Toast.LENGTH_LONG).show();
+                Toast.makeText(ModifyActivity.this, "删除成功", Toast.LENGTH_LONG).show();
                 setResult(1);
                 finish();
             } else {
-                Toast.makeText(ShowDetailActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ModifyActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
-    //检测输入的是否正确
-    private boolean haveError() {
-        if (user.name.equals("")) {
-            Toast.makeText(this, "姓名不能为空", Toast.LENGTH_LONG).show();
-            return true;
-        }
-        Pattern p = null;
-        Matcher m = null;
-        boolean b = false;
-        //验证手机号
-        if (user.phone.equals("")) {
-            Toast.makeText(this, "手机号不能为空", Toast.LENGTH_LONG).show();
-            return true;
-        }
-        //验证手机号格式
-        p = Pattern.compile("^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$"); // 验证手机号
-        m = p.matcher(user.phone);
-        b = m.matches();
-        if (!b) {
-            Toast.makeText(this, "电话号码格式错误", Toast.LENGTH_LONG).show();
-            return true;
-        }
-
-        //验证邮箱
-        if(!user.email.equals("")){
-            p = Pattern.compile("^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$"); //验证邮箱
-            m = p.matcher(user.email);
-            b = m.matches();
-            if (!b) {
-                Toast.makeText(this, "email格式错误", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
 
     /**
@@ -233,4 +191,3 @@ public class ShowDetailActivity extends AppCompatActivity {
         }
     }
 }
-
