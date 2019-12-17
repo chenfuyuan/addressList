@@ -209,6 +209,19 @@
             android:text="删除" />
 
         <Button
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="收藏" />
+
+        <Button
+            android:id="@+id/btn_removestart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="取消收藏" />
+        <Button
             android:id="@+id/btn_return"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

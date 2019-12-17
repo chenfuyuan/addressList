@@ -17,4 +17,6 @@ public class User {
     public String remark;
 
     public String position;
+
+    public String start;
 }

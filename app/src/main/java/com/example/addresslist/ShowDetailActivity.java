@@ -44,9 +44,11 @@ public class ShowDetailActivity extends AppCompatActivity {
     private Button btn_return;
     private Button btn_delete;
     private Button btn_save;
-
+    private Button btn_start;
+    private Button btn_removeStrat;
     private Map userMap;
     private User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +102,7 @@ public class ShowDetailActivity extends AppCompatActivity {
             user.company = edit_company.getText().toString();
             user.remark = edit_remark.getText().toString();
             user.position = edit_position.getText().toString();
+            user.start = (String) userMap.get("start");
             if (haveError()) {
                 return;
             }
@@ -139,6 +142,18 @@ public class ShowDetailActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(ShowDetailActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        btn_start.setOnClickListener(view->{
+            DBHelper.getInstance(this).startUser((Integer) userMap.get("id"));
+            btn_start.setVisibility(View.GONE);
+            btn_removeStrat.setVisibility(View.VISIBLE);
+        });
+
+        btn_removeStrat.setOnClickListener(view->{
+            DBHelper.getInstance(this).moveStartUser((Integer) userMap.get("id"));
+            btn_start.setVisibility(View.VISIBLE);
+            btn_removeStrat.setVisibility(View.GONE);
         });
 
     }
@@ -193,6 +208,19 @@ public class ShowDetailActivity extends AppCompatActivity {
         edit_ohterPhone.setText((String) userMap.get("otherPhone"));
         edit_remark.setText((String) userMap.get("remark"));
         edit_position.setText((String) userMap.get("position"));
+
+        boolean isStart = false;
+        String start = (String) userMap.get("start");
+        System.out.println("start="+start);
+        isStart = start.equals("1");
+        System.out.println("isStart="+isStart);
+        if (isStart) {
+            btn_removeStrat.setVisibility(View.VISIBLE);
+            btn_start.setVisibility(View.GONE);
+        } else {
+            btn_removeStrat.setVisibility(View.GONE);
+            btn_start.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -212,6 +240,8 @@ public class ShowDetailActivity extends AppCompatActivity {
         btn_return = findViewById(R.id.btn_return);
         btn_delete = findViewById(R.id.btn_delete);
         btn_save = findViewById(R.id.btn_save);
+        btn_start = findViewById(R.id.btn_start);
+        btn_removeStrat = findViewById(R.id.btn_removestart);
     }
 
     /**

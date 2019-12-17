@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+
+<LinearLayout
+    android:id="@+id/list_ll"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:id="@+id/list_ll"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/et_search"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <EditText
-            android:id="@+id/et_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter the name or phone"
-            android:textSize="18sp" />
+        android:layout_height="wrap_content"
+        android:hint="Enter the name or phone"
+        android:textSize="18sp" />
 
-        <ListView
-            android:id="@+id/lv_userList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"></ListView>
-    </LinearLayout>
-
-    <GridView
-        android:id="@+id/gv_button_menu"
+    <ListView
+        android:id="@+id/lv_userList"
         android:layout_width="match_parent"
-        android:layout_height="65sp"
-        android:layout_alignParentBottom="true"
-        ></GridView>
+        android:layout_height="wrap_content"></ListView>
+</LinearLayout>
+
+<GridView
+    android:id="@+id/gv_button_menu"
+    android:layout_width="match_parent"
+    android:layout_height="65sp"
+    android:layout_alignParentBottom="true"
+    ></GridView>
 
 </RelativeLayout>

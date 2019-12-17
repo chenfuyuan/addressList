@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ModifyActivity"></activity>
+        <activity android:name=".StartListActivity"></activity>
         <activity android:name=".GroupDetailActivity" />
         <activity android:name=".GroupActivity" />
         <activity android:name=".ShowDetailActivity" />
